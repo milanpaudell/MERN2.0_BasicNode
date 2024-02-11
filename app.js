@@ -1,13 +1,25 @@
 const express = require('express')
 const app = express()
 
+
+const connectToDatabase = require('./database')
+
 //Alternative 
 // Const app = require('express')()
 
 
 
+
+
+connectToDatabase()
+
+
+
 app.get("/", (req,res)=>{
-    res.send("Hello, world!")
+
+    res.status(200).json({
+        "message": "Success",
+    })
 })
 
 
