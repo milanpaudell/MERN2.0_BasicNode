@@ -117,6 +117,74 @@ app.get("/book/:id", async(req,res)=>{
 // })
 
 
+
+
+
+// delete operation 
+
+app.delete("/book/:id", async(req,res)=>{
+    const id = req.params.id
+    await Book.findByIdAndDelete(id)
+    res.status(200).json({
+        message : "Book deleted Successfully"
+    })
+})
+
+// app.delete("/book/:id", (req, res) =>{
+//     const id = req.params.id
+//     Book.findByIdAndDelete(id, (err, book) =>{
+//         if(err){
+//             res.status(500).json({
+//                 message : err.message
+//             })
+//         }else{
+//             res.status(200).json({
+//                 message : "Book deleted Successfully",
+//                 data : book
+//             })
+//         }
+//     })
+// })
+
+
+
+
+
+// Update operation
+
+app.patch("/book/:id", async(req,res)=>{
+    const id = req.params.id  //kun book update garney id ho yo 
+    const { bookName, bookPrice, isbnNumber, authorName, publishedAt, publication } = req.body
+    // console.log(bookName, bookPrice, isbnNumber, authorName, publishedAt)
+
+   await Book.findByIdAndUpdate(id, {
+        // bookName : bookName,
+        // bookPrice: bookPrice,
+        // isbnNumber : isbnNumber,
+        // authorName : authorName,
+        // publishedAt : publishedAt,
+        // publication : publication
+        bookName,
+        bookPrice,
+        isbnNumber,
+        authorName,
+        publishedAt,
+        publication
+    })
+
+
+
+    res.status(200).json({
+        message: "Book updated Successfully"
+    })
+})
+
+
+
+
+
+
+
 app.listen(3000,() => {
     console.log('NodeJS listening on port 3000')
 })
