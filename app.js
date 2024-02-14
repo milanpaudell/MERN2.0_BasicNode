@@ -1,12 +1,17 @@
 const express = require('express')
 const app = express()
 
+//Alternative 
+// Const app = require('express')()
+
 
 const connectToDatabase = require('./database')
 const Book = require('./model/bookModel')
 
-//Alternative 
-// Const app = require('express')()
+// multerconfig imports
+const {multer,storage} = require("./middleware/multerConfig")
+const upload = multer({storage : storage})
+
 
 
 
@@ -26,7 +31,7 @@ app.get("/", (req,res)=>{
 })
 
 
-app.post("/book", async(req,res)=>{
+app.post("/book", upload.single("image"), async(req,res)=>{
     const { bookName, bookPrice, isbnNumber, authorName, publishedAt, publication } = req.body
     // console.log(bookName, bookPrice, isbnNumber, authorName, publishedAt)
 
