@@ -4,6 +4,7 @@ const app = express()
 //Alternative 
 // Const app = require('express')()
 
+const fs = require('fs')
 
 const connectToDatabase = require('./database')
 const Book = require('./model/bookModel')
@@ -30,8 +31,16 @@ app.get("/", (req,res)=>{
     })
 })
 
-
+// create book
 app.post("/book", upload.single("image"), async(req,res)=>{
+    
+    let fileName ;
+    if(!req.file){
+        fileName = "https://cdn.vectorstock.com/i/preview-1x/77/30/default-avatar-profile-icon-grey-photo-placeholder-vector-17317730.jpg"
+    }else{
+       fileName = "http://localhost:3000/" + req.file.filename
+    }
+
     const { bookName, bookPrice, isbnNumber, authorName, publishedAt, publication } = req.body
     // console.log(bookName, bookPrice, isbnNumber, authorName, publishedAt)
 
@@ -41,13 +50,15 @@ app.post("/book", upload.single("image"), async(req,res)=>{
         // isbnNumber : isbnNumber,
         // authorName : authorName,
         // publishedAt : publishedAt,
-        // publication : publication
+        // publication : publication,
+        // imageUrl : fileName
         bookName,
         bookPrice,
         isbnNumber,
         authorName,
         publishedAt,
-        publication
+        publication,
+        imageUrl : fileName
     })
 
 
@@ -157,10 +168,29 @@ app.delete("/book/:id", async(req,res)=>{
 
 // Update operation
 
-app.patch("/book/:id", async(req,res)=>{
+app.patch("/book/:id", upload.single('image'), async(req,res)=>{
     const id = req.params.id  //kun book update garney id ho yo 
     const { bookName, bookPrice, isbnNumber, authorName, publishedAt, publication } = req.body
     // console.log(bookName, bookPrice, isbnNumber, authorName, publishedAt)
+
+    const oldDatas = await Book.findById(id)
+    let fileName;
+    if(req.file){
+
+        const oldImagePath = oldDatas.imageUrl
+        console.log(oldImagePath)
+        const localHostUrlLength = "http://localhost:3000/".length
+        const newOldImagePath = oldImagePath.slice(localHostUrlLength)
+        console.log(newOldImagePath)
+        fs.unlink(`storage/${newOldImagePath}`,(err)=>{
+            if(err){
+                console.log(err)
+            }else{
+                console.log("File Deleted Successfully")
+            }
+        })
+        fileName = "http://localhost:3000/" + req.file.filename
+    }
 
    await Book.findByIdAndUpdate(id, {
         // bookName : bookName,
@@ -168,13 +198,15 @@ app.patch("/book/:id", async(req,res)=>{
         // isbnNumber : isbnNumber,
         // authorName : authorName,
         // publishedAt : publishedAt,
-        // publication : publication
+        // publication : publication,
+        // imageUrl : fileName
         bookName,
         bookPrice,
         isbnNumber,
         authorName,
         publishedAt,
-        publication
+        publication,
+        imageUrl : fileName
     })
 
 
@@ -187,6 +219,7 @@ app.patch("/book/:id", async(req,res)=>{
 
 
 
+app.use(express.static("./storage/"))
 
 
 
